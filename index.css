@@ -33,7 +33,7 @@ p, h1 {
   text-align: center;
 }
 
-.windowsbox, .applebox, .googlebox {
+.windowsbox, .applebox, .googlebox, .ktvbox {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -64,6 +64,11 @@ p, h1 {
   border: solid 3px #3DDC84;
 }
 
+.ktvbox {
+  color: #006ca2;
+  border: solid 3px #006ca2;
+}
+
 /* aタグをflex中央揃え＆範囲限定 */
 .link {
   display: flex;
@@ -76,7 +81,8 @@ p, h1 {
 }
 
 .windows-logo,
-.google-logo {
+.google-logo,
+.ktv-logo {
   width: 37.5px;
   height: 37.5px;
 }
