@@ -1,0 +1,156 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background-color: #212121;
+}
+
+p {
+    color: white;
+    text-decoration: none;
+}
+
+.content-area {
+  display: flex;
+  height: 100vh;  /* 画面の高さいっぱい */
+  overflow: hidden;
+}
+
+.menu-frame {
+  width: 220px;
+  height: 100vh;  /* ここがポイント */
+  border: none;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;  /* コンテンツが長いときはスクロール */
+  display: flexbox;
+}
+
+header {
+  height: 100px;
+  background-color: #171717;
+  color: white;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+h1 {
+  margin-left: 10px;
+  font-size: 40px;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.home, .onair, .gap{
+    font-size: 15px;
+    margin-left: 15px;
+}
+
+h2, h3 {
+    color: white;
+    margin-left: 20px;
+}
+
+h3 {
+    color: white;
+    margin-left: 20px;
+    font-size: 22.5px;
+}
+
+.live {
+    border: 2px solid #ff0000;
+    margin-left: 20px;
+    margin-top: 20px;
+    float: left;
+}
+
+.thumbnail {
+    margin: 10px;
+}
+
+.btn-flat-simple1 {
+  margin-left: 10px;
+  position: relative;
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  text-decoration: none;
+  color: #ffffff;
+  background: #ff0000;
+  transition: .4s;
+  font-size: 15px;
+  border-radius: 10px;
+}
+
+.btn-flat-simple1:hover {
+  background: #fd7e00;
+  color: #ffffff;
+}
+
+.program_text {
+  color: white;
+}
+
+.program {
+  margin-left: 20px;
+  margin-top: 20px;
+  float: left;
+}
+
+.to {
+  clear: both;
+  margin-left: 20px;
+  margin-top: 400px;
+}
+
+
+.btn-flat-simple2 {
+  margin-left: 10px;
+  position: relative;
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  text-decoration: none;
+  color: #ffffff;
+  background: #0000ff;
+  transition: .4s;
+  font-size: 20px;
+  border-radius: 10px;
+}
+
+.btn-flat-simple2:hover {
+  background: #21a0db;
+  color: #ffffff;
+}
+
+.btn-flat-simple3 {
+  margin-left: 10px;
+  margin-top: 10px;
+  position: relative;
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  text-decoration: none;
+  color: #ffffff;
+  background: #008000;
+  transition: .4s;
+  font-size: 20px;
+  border-radius: 10px;
+}
+
+.btn-flat-simple3:hover {
+  background: #40ba8d;
+  color: #ffffff;
+}
+
+.whats {
+  font-size: 15px;
+  margin-left: 20px;
+  margin-top: 30px;
+}
+
+.whatstext {
+  color: white;
+  margin-left: 15px;
+  font-size: 15px;
+}
