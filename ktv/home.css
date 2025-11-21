@@ -21,6 +21,11 @@ p {
   border: none;
   flex-shrink: 0;
 }
+@media (max-width: 600px) {
+  .menu-frame {
+    display: none;  /* 画面幅が600px以下の場合は非表示 */
+  }
+}
 
 .main-content {
   flex: 1;
@@ -28,13 +33,45 @@ p {
   display: flexbox;
 }
 
-header {
+.smartphone_header {
+  height: 50px;
+  width: 100%;
+  background-color: #111111;
+  color: white;
+  flex-shrink: 0;
+}
+@media (min-width: 601px) {
+  .smartphone_header {
+    display: none;  /* 画面幅が601px以上の場合は非表示 */
+  }
+}
+
+.common_header {
   height: 100px;
   background-color: #171717;
   color: white;
   display: flex;
   align-items: center;
   box-sizing: border-box;
+}
+
+.smartphone_buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+}
+@media (min-width: 601px) {
+  .smartphone_buttons {
+    display: none;  /* 画面幅が601px以上の場合は非表示 */
+  }
+}
+
+.smartphone_button {
+  background-color: #333333;
+  color: white;
+  padding: 10px 15px;
+  text-decoration: non
 }
 
 h1 {
@@ -62,8 +99,7 @@ h3 {
 
 .live {
     border: 2px solid #ff0000;
-    margin-left: 20px;
-    margin-top: 20px;
+    margin: 20px;
     float: left;
 }
 
@@ -73,6 +109,7 @@ h3 {
 
 .btn-flat-simple1 {
   margin-left: 10px;
+  margin-top: 10px;
   position: relative;
   display: inline-block;
   padding: 0.25em 0.5em;
