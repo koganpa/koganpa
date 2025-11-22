@@ -1,9 +1,9 @@
 const peer = new Peer({
-  key: 'd940e091-a4fa-4946-baa0-3bf8ffa296bd',
+  key: 'a43fe550-05fc-4ad6-a371-89b2e2125e38',
   debug: 3,
 });
 
-console.log("d940e091-a4fa-4946-baa0-3bf8ffa296bd:", SKYWAY_APP_ID);
+console.log("SKYWAY_APP_ID:", SKYWAY_APP_ID);
 
 document.getElementById('startBtn').onclick = async () => {
   try {
