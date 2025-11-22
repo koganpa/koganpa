@@ -3,14 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ライブ配信（配信者）</title>
-  <!-- SDK のロード（公式ガイドに合わせて） -->
-  <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.min.js"></script>
-  <script src="stream.js" defer></script>
+  <title>SkyWay Streamer</title>
+  <script src="https://cdn.jsdelivr.net/npm/skyway-js@4.4.2/dist/skyway.min.js"></script>
 </head>
 <body>
-  <h1>配信者専用画面</h1>
-  <video id="localVideo" autoplay muted playsinline style="width:400px; border:2px solid #444; border-radius:8px;"></video><br>
+  <h1>SkyWay 配信テスト</h1>
+  <video id="localVideo" autoplay playsinline muted style="width: 320px; height: 240px; background: black;"></video>
   <button id="startBtn">配信開始</button>
+
+  <script>
+    const SKYWAY_API_KEY = '7b2695fe-e087-45b1-98b7-b4020baeca31'; // ここにAPIキー入れて！
+
+    const localVideo = document.getElementById('localVideo');
+    const startBtn = document.getElementById('startBtn');
+
+    let localStream;
+    let peer;
+
+    async function getMedia() {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localVideo.srcObject = localStream;
+      } catch (err) {
+        alert('カメラとマイクの取得に失敗しました: ' + err.message);
+      }
+    }
+
+    startBtn.onclick = async () => {
+      if (!localStream) {
+        await getMedia();
+      }
+      if (!peer) {
+        peer = new Peer({ key: SKYWAY_API_KEY, debug: 3 });
+        peer.on('open', id => {
+          console.log('Peer ID:', id);
+          alert('配信準備完了！Peer ID: ' + id);
+          // ここで相手からのコール待ちとか、配信処理を書く
+        });
+        peer.on('error', err => {
+          alert('Peerエラー: ' + err);
+          console.error(err);
+        });
+      }
+    };
+  </script>
 </body>
 </html>
