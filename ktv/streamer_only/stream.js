@@ -1,5 +1,5 @@
 const peer = new Peer({
-  key: '6e21fb13-42b8-488b-9371-394c3aac5df1',
+  key: 'd940e091-a4fa-4946-baa0-3bf8ffa296bd',
   debug: 3,
 });
 
@@ -17,3 +17,4 @@ document.getElementById('startBtn').onclick = async () => {
     alert('配信に失敗しました');
   }
 };
+
