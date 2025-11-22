@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ライブ配信（配信者）</title>
+  <!-- SkyWay SDK グローバル読み込み -->
+  <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.min.js"></script>
+  <script src="stream.js"></script>
+  <style>
+    body { font-family: sans-serif; }
+    video { width: 400px; border: 2px solid #444; border-radius: 8px; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>配信者専用画面</h1>
+  <video id="localVideo" autoplay muted playsinline></video><br>
+  <button id="startBtn">配信開始</button>
+</body>
+</html>
