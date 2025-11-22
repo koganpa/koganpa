@@ -3,27 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ライブ配信（配信者）</title>
-  
-  <!-- SkyWay 最新SDK（グローバル変数skyway_roomを使う方式） -->
-  <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.min.js"></script>
-  <script src="https://cdn.webrtc.ecl.ntt.com/skyway-4.4.2.js"></script>
-  <script src="stream.js" defer></script>
-  
+  <title>SkyWayライブ配信テスト</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #222; color: #eee; }
-    video { width: 400px; border-radius: 8px; border: 2px solid #666; }
-    button { margin-top: 10px; padding: 12px 24px; font-size: 18px; cursor: pointer; }
+    video {
+      width: 320px;
+      height: 240px;
+      background: #000;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room@latest/dist/skyway_room-latest.js"></script>
 </head>
 <body>
-  <h1>配信者専用画面</h1>
-  
+  <h1>SkyWay ライブ配信テスト</h1>
   <video id="localVideo" autoplay muted playsinline></video><br />
-  <button id="startBtn">配信開始</button>
-  
+  <button id="startBtn">配信スタート</button>
+
+  <script>
+    // APIキー（必ず正しいものに差し替えてね！）
+    const SKYWAY_APP_ID = "a43fe550-05fc-4ad6-a371-89b2e2125e38";
+
+    // skyway_roomから必要なクラスを取得
+    const { SkyWayContext, SkyWayStreamFactory, SkyWayRoom } = window.skyway_room;
+
+    document.getElementById("startBtn").onclick = async () => {
+      try {
+        // カメラ映像を取得
+        const stream = await SkyWayStreamFactory.createCameraVideoStream();
+        const videoElem = document.getElementById("localVideo");
+        videoElem.srcObject = stream.mediaStream;
+
+        // SkyWayに接続（App IDだけで認証）
+        const context = await SkyWayContext.Create(SKYWAY_APP_ID);
+
+        // 部屋を作成または参加（p2p）
+        const room = await SkyWayRoom.FindOrCreate(context, {
+          name: "live-stream",
+          type: "p2p",
+        });
+
+        // 部屋に参加
+        const me = await room.join();
+
+        // 映像を配信
+        await me.publish(stream);
+
+        alert("配信を開始したよ！");
+      } catch (err) {
+        console.error("配信失敗エラー:", err);
+        alert("配信に失敗しました。コンソールを見てね！");
+      }
+    };
+  </script>
 </body>
 </html>
-
-
-
