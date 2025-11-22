@@ -49,6 +49,11 @@ console.log(token);
 const init = async () => {
     const roomIdInput = document.getElementById('room-id');
     const userIdDisplay = document.getElementById('user-id');
+    const localVideo = document.getElementById('local-video');
+    const { audio, video } = await SkyWayStreamFactory.createMicrophoneAudioAndCameraStream();
+    video.attach(localVideo);
+    await localVideo.play();
+
 
     document.getElementById("stream").onclick = async () => {
         if (roomIdInput.value === '') {
@@ -56,6 +61,33 @@ const init = async () => {
             return;
         }
 
+      const me = await room.join();
+      userIdDisplay.innerText = me.id;
+
+      await me.publish(video); // 映像を配信
+      await me.publish(audio); // 音声を配信
+    }
+
         const context = await SkyWayContext.Create(token);
     }
 }
+
+document.getElementById("stream").onclick = async () => {
+    if (roomIdInput.value === '') {
+        alert('ルームIDを入力してください');
+        return;
+    }
+
+    const context = await SkyWayContext.Create(token);
+
+    const room = await SkyWayRoom.FindOrCreate(context, {
+        type: "sfu",
+        name: roomIdInput.value,
+    });
+    const me = await room.join();
+    userIdDisplay.innerText = me.id;
+}
+
+const init = async () => { ... };
+
+window.onload = init;
