@@ -45,3 +45,17 @@ const token = new SkyWayAuthToken({
 }).encode('SecretKEY');
 
 console.log(token);
+
+const init = async () => {
+    const roomIdInput = document.getElementById('room-id');
+    const userIdDisplay = document.getElementById('user-id');
+
+    document.getElementById("stream").onclick = async () => {
+        if (roomIdInput.value === '') {
+            alert('ルームIDを入力してください');
+            return;
+        }
+
+        const context = await SkyWayContext.Create(token);
+    }
+}
