@@ -1,23 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<title>SkyWay Test</title>
-<script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room@latest/dist/skyway_room-latest.js"></script>
-<script>
-  const SKYWAY_APP_ID = "a43fe550-05fc-4ad6-a371-89b2e2125e38";
-
-  async function start() {
-    try {
-      const context = await window.skyway_room.SkyWayContext.Create(SKYWAY_APP_ID);
-      console.log("SkyWay connected!");
-    } catch(e) {
-      console.error(e);
-    }
-  }
-</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ライブ配信（配信者）</title>
+  <!-- SDK のロード（公式ガイドに合わせて） -->
+  <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.min.js"></script>
+  <script src="stream.js" defer></script>
 </head>
 <body>
-<button onclick="start()">接続テスト</button>
+  <h1>配信者専用画面</h1>
+  <video id="localVideo" autoplay muted playsinline style="width:400px; border:2px solid #444; border-radius:8px;"></video><br>
+  <button id="startBtn">配信開始</button>
 </body>
 </html>
