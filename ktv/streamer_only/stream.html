@@ -1,102 +1,18 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <title>SkyWay映像配信シンプル</title>
-  <style>
-    video {
-      width: 300px;
-      border: 1px solid #333;
-      margin: 5px;
-    }
-  </style>
-  <script src="https://cdn.webrtc.ecl.ntt.com/skyway-4.4.2.js"></script>
-</head>
+<html>
+<head><title>SkyWay Test</title></head>
 <body>
-  <h2>SkyWay WebRTC 配信 & 受信デモ</h2>
-
-  <p>自分の映像（送信側）</p>
-  <video id="my-video" autoplay muted playsinline></video>
-
-  <p>相手の映像（受信側）</p>
-  <video id="remote-video" autoplay playsinline></video>
-
-  <br />
-
-  <input id="room-id" placeholder="ルームIDを入力" />
-  <button id="join-btn">ルーム参加</button>
-
-  <script>
-    // ここにあなたのSkyWay APIキーを入れてね
-    const API_KEY = "7b2695fe-e087-45b1-98b7-b4020baeca31";
-
-    const localVideo = document.getElementById("my-video");
-    const remoteVideo = document.getElementById("remote-video");
-    const joinBtn = document.getElementById("join-btn");
-    const roomIdInput = document.getElementById("room-id");
-
-    let localStream;
-    let peer;
-
-    // カメラ・マイク映像取得
-    async function getLocalStream() {
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localVideo.srcObject = localStream;
-      } catch (err) {
-        alert("カメラまたはマイクのアクセスが拒否されました: " + err);
-      }
-    }
-
-    // SkyWay Peer接続初期化
-    function createPeer() {
-      return new Peer({
-        key: API_KEY,
-        debug: 3,
-      });
-    }
-
-    // ルーム参加処理
-    joinBtn.onclick = async () => {
-      if (!roomIdInput.value) {
-        alert("ルームIDを入力してね！");
-        return;
-      }
-      joinBtn.disabled = true;
-
-      peer = createPeer();
-
-      peer.on("open", async (id) => {
-        console.log("Peer ID:", id);
-        // ルームに参加
-        const room = peer.joinRoom(roomIdInput.value, {
-          mode: "sfu",
-          stream: localStream,
-        });
-
-        room.on("stream", stream => {
-          // 相手の映像が来たらremoteVideoにセット
-          remoteVideo.srcObject = stream;
-        });
-
-        room.on("peerLeave", peerId => {
-          console.log(peerId, "が退出");
-          remoteVideo.srcObject = null;
-        });
-
-        room.on("close", () => {
-          console.log("ルームを退出");
-          remoteVideo.srcObject = null;
-        });
-      });
-
-      peer.on("error", err => {
-        alert("エラー: " + err);
-        joinBtn.disabled = false;
-      });
-    };
-
-    getLocalStream();
-  </script>
+<script src="https://cdn.webrtc.ecl.ntt.com/skyway-4.4.2.js"></script>
+<script>
+  const API_KEY = "7b2695fe-e087-45b1-98b7-b4020baeca31";
+  const peer = new Peer({ key: API_KEY, debug: 3 });
+  peer.on('open', id => {
+    console.log("Peer Open! ID:", id);
+    alert("接続成功！APIキーはOK");
+  });
+  peer.on('error', err => {
+    alert("エラー発生：" + err);
+  });
+</script>
 </body>
 </html>
