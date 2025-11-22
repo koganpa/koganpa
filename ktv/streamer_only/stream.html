@@ -1,58 +1,23 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyWayライブ配信テスト</title>
-  <style>
-    video {
-      width: 320px;
-      height: 240px;
-      background: #000;
+<meta charset="UTF-8" />
+<title>SkyWay Test</title>
+<script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room@latest/dist/skyway_room-latest.js"></script>
+<script>
+  const SKYWAY_APP_ID = "a43fe550-05fc-4ad6-a371-89b2e2125e38";
+
+  async function start() {
+    try {
+      const context = await window.skyway_room.SkyWayContext.Create(SKYWAY_APP_ID);
+      console.log("SkyWay connected!");
+    } catch(e) {
+      console.error(e);
     }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room@latest/dist/skyway_room-latest.js"></script>
+  }
+</script>
 </head>
 <body>
-  <h1>SkyWay ライブ配信テスト</h1>
-  <video id="localVideo" autoplay muted playsinline></video><br />
-  <button id="startBtn">配信スタート</button>
-
-  <script>
-    // APIキー（必ず正しいものに差し替えてね！）
-    const SKYWAY_APP_ID = "a43fe550-05fc-4ad6-a371-89b2e2125e38";
-
-    // skyway_roomから必要なクラスを取得
-    const { SkyWayContext, SkyWayStreamFactory, SkyWayRoom } = window.skyway_room;
-
-    document.getElementById("startBtn").onclick = async () => {
-      try {
-        // カメラ映像を取得
-        const stream = await SkyWayStreamFactory.createCameraVideoStream();
-        const videoElem = document.getElementById("localVideo");
-        videoElem.srcObject = stream.mediaStream;
-
-        // SkyWayに接続（App IDだけで認証）
-        const context = await SkyWayContext.Create(SKYWAY_APP_ID);
-
-        // 部屋を作成または参加（p2p）
-        const room = await SkyWayRoom.FindOrCreate(context, {
-          name: "live-stream",
-          type: "p2p",
-        });
-
-        // 部屋に参加
-        const me = await room.join();
-
-        // 映像を配信
-        await me.publish(stream);
-
-        alert("配信を開始したよ！");
-      } catch (err) {
-        console.error("配信失敗エラー:", err);
-        alert("配信に失敗しました。コンソールを見てね！");
-      }
-    };
-  </script>
+<button onclick="start()">接続テスト</button>
 </body>
 </html>
