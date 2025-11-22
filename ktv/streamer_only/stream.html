@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head><title>SkyWay Test</title></head>
-<body>
-<script src="https://cdn.webrtc.ecl.ntt.com/skyway-4.4.2.js"></script>
-<script>
-  const API_KEY = "7b2695fe-e087-45b1-98b7-b4020baeca31";
-  const peer = new Peer({ key: API_KEY, debug: 3 });
-  peer.on('open', id => {
-    console.log("Peer Open! ID:", id);
-    alert("接続成功！APIキーはOK");
-  });
-  peer.on('error', err => {
-    alert("エラー発生：" + err);
-  });
-</script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <title>ライブ配信</title>
+        <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.js"></script>
+        <script src="stream.js"></script>
+    </head>
+    <body>
+        <p>UserID: <span id="my-id"></span></p>
+        <div>
+            ルームID: <input id="room-name" type="text" />
+            <button id="join">配信開始</button>
+        </div>
+        <video id="local-video" width="400px" muted playsinline></video>
+    </body>
 </html>
+
