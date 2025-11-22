@@ -2,50 +2,101 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyWay Streamer</title>
-  <script src="https://cdn.jsdelivr.net/npm/skyway-js@4.4.2/dist/skyway.min.js"></script>
+  <title>SkyWay映像配信シンプル</title>
+  <style>
+    video {
+      width: 300px;
+      border: 1px solid #333;
+      margin: 5px;
+    }
+  </style>
+  <script src="https://cdn.webrtc.ecl.ntt.com/skyway-4.4.2.js"></script>
 </head>
 <body>
-  <h1>SkyWay 配信テスト</h1>
-  <video id="localVideo" autoplay playsinline muted style="width: 320px; height: 240px; background: black;"></video>
-  <button id="startBtn">配信開始</button>
+  <h2>SkyWay WebRTC 配信 & 受信デモ</h2>
+
+  <p>自分の映像（送信側）</p>
+  <video id="my-video" autoplay muted playsinline></video>
+
+  <p>相手の映像（受信側）</p>
+  <video id="remote-video" autoplay playsinline></video>
+
+  <br />
+
+  <input id="room-id" placeholder="ルームIDを入力" />
+  <button id="join-btn">ルーム参加</button>
 
   <script>
-    const SKYWAY_API_KEY = '7b2695fe-e087-45b1-98b7-b4020baeca31'; // ここにAPIキー入れて！
+    // ここにあなたのSkyWay APIキーを入れてね
+    const API_KEY = "7b2695fe-e087-45b1-98b7-b4020baeca31";
 
-    const localVideo = document.getElementById('localVideo');
-    const startBtn = document.getElementById('startBtn');
+    const localVideo = document.getElementById("my-video");
+    const remoteVideo = document.getElementById("remote-video");
+    const joinBtn = document.getElementById("join-btn");
+    const roomIdInput = document.getElementById("room-id");
 
     let localStream;
     let peer;
 
-    async function getMedia() {
+    // カメラ・マイク映像取得
+    async function getLocalStream() {
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         localVideo.srcObject = localStream;
       } catch (err) {
-        alert('カメラとマイクの取得に失敗しました: ' + err.message);
+        alert("カメラまたはマイクのアクセスが拒否されました: " + err);
       }
     }
 
-    startBtn.onclick = async () => {
-      if (!localStream) {
-        await getMedia();
+    // SkyWay Peer接続初期化
+    function createPeer() {
+      return new Peer({
+        key: API_KEY,
+        debug: 3,
+      });
+    }
+
+    // ルーム参加処理
+    joinBtn.onclick = async () => {
+      if (!roomIdInput.value) {
+        alert("ルームIDを入力してね！");
+        return;
       }
-      if (!peer) {
-        peer = new Peer({ key: SKYWAY_API_KEY, debug: 3 });
-        peer.on('open', id => {
-          console.log('Peer ID:', id);
-          alert('配信準備完了！Peer ID: ' + id);
-          // ここで相手からのコール待ちとか、配信処理を書く
+      joinBtn.disabled = true;
+
+      peer = createPeer();
+
+      peer.on("open", async (id) => {
+        console.log("Peer ID:", id);
+        // ルームに参加
+        const room = peer.joinRoom(roomIdInput.value, {
+          mode: "sfu",
+          stream: localStream,
         });
-        peer.on('error', err => {
-          alert('Peerエラー: ' + err);
-          console.error(err);
+
+        room.on("stream", stream => {
+          // 相手の映像が来たらremoteVideoにセット
+          remoteVideo.srcObject = stream;
         });
-      }
+
+        room.on("peerLeave", peerId => {
+          console.log(peerId, "が退出");
+          remoteVideo.srcObject = null;
+        });
+
+        room.on("close", () => {
+          console.log("ルームを退出");
+          remoteVideo.srcObject = null;
+        });
+      });
+
+      peer.on("error", err => {
+        alert("エラー: " + err);
+        joinBtn.disabled = false;
+      });
     };
+
+    getLocalStream();
   </script>
 </body>
 </html>
