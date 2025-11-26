@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>コガテレ ログイン</title>
+</head>
+<body>
+
+<script>
+// ---- 設定 ----
+// ユーザー名をキーにパスワードを値にするオブジェクト
+const USERS = {
+  "koganpa": "h16300052k",
+  "aroe": "chicken0328",
+  "hakaishin_sota": "sota0827"
+};
+
+const REDIRECT = "https://koganpa.github.io/koganpa/ktv/home.html";  // ログイン成功後の遷移先
+// ----------------
+
+// ユーザー名入力
+const user = prompt("ユーザー名を入力してください。");
+// パスワード入力
+const pass = prompt("パスワードを入力してください。");
+
+// ユーザー名の存在とパスワードチェック
+if (USERS[user] && USERS[user] === pass) {
+  alert("ようこそ！OKボタンを押して下さい。");
+  location.href = REDIRECT;
+} else {
+  alert("ログインに失敗しました。もう一度お試しください。");
+  location.reload();
+}
+</script>
+
+</body>
+</html>
