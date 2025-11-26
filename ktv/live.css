@@ -2,6 +2,8 @@ html, body {
   margin: 0;
   height: 100%;
   background-color: #212121;
+  scrollbar-width: none;
+
 }
 
 p {
@@ -81,113 +83,72 @@ h1 {
   font-style: italic;
 }
 
-.home, .onair, .gap{
-    font-size: 15px;
-    margin-left: 15px;
-}
-
-h2, h3 {
-    color: white;
-    margin-left: 20px;
-}
-
-h3 {
-    color: white;
-    margin-left: 20px;
-    font-size: 22.5px;
-}
-
 .live {
-    border: 2px solid #ff0000;
-    margin: 20px;
-    float: left;
-}
-
-.live_preview {
-    margin: 10px;
-}
-
-.btn-flat-simple1 {
-  margin-left: 10px;
-  margin-top: 10px;
-  position: relative;
-  display: inline-block;
-  padding: 0.25em 0.5em;
-  text-decoration: none;
-  color: #ffffff;
-  background: #ff0000;
-  transition: .4s;
   font-size: 15px;
-  border-radius: 10px;
+  margin-left: 15px;
 }
 
-.btn-flat-simple1:hover {
-  background: #fd7e00;
+.player {
+  border: #939393 5px solid;
+  margin-top: 20px;
+  margin-left: 20px;
+  display: inline-block;
+}
+@media (max-width: 600px) {
+  .player {
+    margin-top: 0px;
+    margin-left: 0px;
+    width: 100vw;
+    box-sizing: border-box;
+    border: none;
+  }
+}
+
+.live_screen {
+  width: 60vw;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+@media (max-width: 600px) {
+  .live_screen {
+    width: 100vw;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.title {
   color: #ffffff;
+  margin-left: 30px;
+  font-size: 25px;
 }
 
-.program_text {
-  color: white;
+.explanation {
+  color: #aaaaaa;
+  margin-left: 30px;
 }
 
 .program {
   margin-left: 20px;
   margin-top: 20px;
-  float: left;
 }
 
-.to {
-  clear: both;
-  margin-left: 20px;
-  margin-top: 400px;
+.check {
+  color: #ff0000;
 }
 
-
-.btn-flat-simple2 {
-  margin-left: 10px;
+.btn-flat-simple {
+  margin-bottom: 10px;
   position: relative;
   display: inline-block;
   padding: 0.25em 0.5em;
   text-decoration: none;
-  color: #ffffff;
-  background: #0000ff;
+  color: #000000;
+  background: #ffff00;
   transition: .4s;
   font-size: 20px;
   border-radius: 10px;
 }
-
-.btn-flat-simple2:hover {
-  background: #21a0db;
-  color: #ffffff;
-}
-
-.btn-flat-simple3 {
-  margin-left: 10px;
-  margin-top: 10px;
-  position: relative;
-  display: inline-block;
-  padding: 0.25em 0.5em;
-  text-decoration: none;
-  color: #ffffff;
-  background: #008000;
-  transition: .4s;
-  font-size: 20px;
-  border-radius: 10px;
-}
-
-.btn-flat-simple3:hover {
-  background: #40ba8d;
-  color: #ffffff;
-}
-
-.whats {
-  font-size: 15px;
-  margin-left: 20px;
-  margin-top: 30px;
-}
-
-.whatstext {
-  color: white;
-  margin-left: 15px;
-  font-size: 15px;
+.btn-flat-simple:hover {
+  background: #ffcc33;
+  color: #000000;
 }
