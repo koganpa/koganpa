@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KTV/コガテレ ライブ</title>
+    <link rel="stylesheet" href="ondemand.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+    <!-- SkyWay SFU CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/sfu-client/dist/skyway_sfu-client-latest.js"></script>
+    <!-- ページ共通のJS（君のやつ） -->
+    <script src="home.js"></script>
+    <!-- ライブ視聴ロジック -->
+    <script src="live.js" defer></script>
+  </head>
+  <body>
+      <div class="content-area">
+        <iframe src="aside.html" class="menu-frame" style="width:200px; height:100vh; border:none;"></iframe>
+        <main class="main-content">
+            <header class="smartphone_header">
+                <iframe src="ktv_header.html" style="width:100vw; height:100px; border:none;"></iframe>
+            </header>
+            <header>
+                <div class="smartphone_buttons">
+                    <a href="home.html" class="smartphone_button">ホーム</a>
+                    <a href="https://x.gd/SgxLK" class="smartphone_button">ライブ</a>
+                    <a href="ondemand.html" class="smartphone_button">番組表</a>
+                    <a href="https://x.gd/WOM5t" class="smartphone_button">アーカイブ</a>
+                </div>
+            </header>
+            <header class="common_header">
+                <h1>見逃し配信<small class="ondemand">ondemand</small></h1>
+            </header>
+            <h2 class="minogashi">見逃し配信について</h2>
+            <p class="explanation">見逃し配信は、<b>最も最新のライブ配信のみ</b>をダウンロードなしで視聴できます。</p>
+            <p class="explanation">最も最新のライブ配信のみのため、より以前の配信をご覧いただくには、<a href="https://x.gd/WOM5t">こちら</a>のアーカイブからご覧ください。</p>
+            <p class="explanation">※アーカイブの視聴には端末へのダウンロードが必要です。</p>
+            <div class="player">
+                <video src="ktv_sample.mp4" class="ondemand_screen" controls="else"></video>
+                <h2 class="title">サンプル動画</h2>
+                <p class="explanation_player">わざわざ時間を取って撮影したサンプル動画です。</p>
+                <p class="explanation_player">2025/11/26 21:50～</p>
+            </div>
+        </main>
+      </div>
+  </body>
+</html>

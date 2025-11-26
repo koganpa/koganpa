@@ -1,0 +1,140 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background-color: #212121;
+  scrollbar-width: none;
+
+}
+
+p {
+    color: white;
+    text-decoration: none;
+}
+
+.content-area {
+  display: flex;
+  height: 100vh;  /* 画面の高さいっぱい */
+  overflow: hidden;
+}
+
+.menu-frame {
+  width: 220px;
+  height: 100vh;  /* ここがポイント */
+  border: none;
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .menu-frame {
+    display: none;  /* 画面幅が600px以下の場合は非表示 */
+  }
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;  /* コンテンツが長いときはスクロール */
+  display: flexbox;
+}
+
+.smartphone_header {
+  height: 50px;
+  width: 100%;
+  background-color: #111111;
+  color: white;
+  flex-shrink: 0;
+}
+@media (min-width: 601px) {
+  .smartphone_header {
+    display: none;  /* 画面幅が601px以上の場合は非表示 */
+  }
+}
+
+.common_header {
+  height: 100px;
+  background-color: #171717;
+  color: white;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.smartphone_buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+}
+@media (min-width: 601px) {
+  .smartphone_buttons {
+    display: none;  /* 画面幅が601px以上の場合は非表示 */
+  }
+}
+
+.smartphone_button {
+  background-color: #333333;
+  color: white;
+  padding: 10px 15px;
+  text-decoration: non
+}
+
+h1 {
+  margin-left: 10px;
+  font-size: 40px;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.ondemand {
+  font-size: 15px;
+  margin-left: 15px;
+}
+
+.minogashi {
+  margin-left: 10px;
+  font-size: 30px;
+  color: white;
+}
+
+.explanation {
+  margin-left: 10px;
+  font-size: 14px;
+  color: white;
+}
+
+.player {
+  border: #939393 5px solid;
+  margin-top: 20px;
+  margin-left: 20px;
+  display: inline-block;
+}
+@media (max-width: 600px) {
+  .player {
+    margin-top: 0px;
+    margin-left: 0px;
+    width: 100vw;
+    box-sizing: border-box;
+    border: none;
+  }
+}
+
+.ondemand_screen {
+  width: 50vw;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+@media (max-width: 600px) {
+  .ondemand_screen {
+    width: 100vw;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.title {
+  color: #ffffff;
+  margin-left: 30px;
+  font-size: 25px;
+}
+
+.explanation_player {
+  color: #aaaaaa;
+  margin-left: 30px;
+}
