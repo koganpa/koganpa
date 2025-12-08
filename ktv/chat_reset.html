@@ -51,7 +51,13 @@
         // -----------------------------------------------------
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        let firebaseConfig = {};
+        try {
+            // firebaseConfigをパースする際のエラーもキャッチ
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        } catch (e) {
+            console.error("Firebase config JSONパースエラー:", e);
+        }
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let db;
@@ -103,7 +109,7 @@
         async function initializeFirebase() {
             try {
                 if (Object.keys(firebaseConfig).length === 0) {
-                    throw new Error("Firebase configが見つかりません。");
+                    throw new Error("Firebase config（設定情報）が見つかりません。");
                 }
                 
                 const app = initializeApp(firebaseConfig);
@@ -128,6 +134,7 @@
             } catch (error) {
                 console.error("Firebase初期化エラー:", error);
                 statusEl.textContent = `エラー: ${error.message}`;
+                showFeedback(`初期化エラー: ${error.message} 環境設定を確認してください。`, true); // 詳細なフィードバック
                 updateUI(false, null);
             }
         }
@@ -143,7 +150,6 @@
             }
 
             // Canvas環境ではwindow.confirm()は動作しませんが、ローカル環境での安全性のために残します。
-            // 実行環境（Canvas）では、このプロンプトはスキップされるか、フィードバックエリアに結果が表示されます。
             if (!window.confirm('本当にチャットメッセージを全て削除しますか？この操作は元に戻せません。')) {
                  showFeedback("リセットをキャンセルしました。", false);
                 return;
