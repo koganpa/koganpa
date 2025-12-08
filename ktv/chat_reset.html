@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>チャットリセット管理ツール</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
+        <h1 class="text-2xl font-bold mb-4 text-gray-800">チャットデータ管理者ツール</h1>
+        <p id="user-status" class="text-sm text-red-500 mb-6">認証中...</p>
+        
+        <p class="text-gray-700 mb-6">このボタンを押すと、すべてのチャットメッセージが完全に削除されます。</p>
+        
+        <button 
+            id="reset-chat-button" 
+            class="w-full py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled
+        >
+            チャットを完全にリセット
+        </button>
+        
+        <div id="feedback" class="mt-4 p-3 rounded-lg hidden text-left text-sm font-medium"></div>
+    </div>
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            query, 
+            getDocs, 
+            deleteDoc, 
+            doc 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // -----------------------------------------------------
+        // 1. Firebase初期化とグローバル変数
+        // -----------------------------------------------------
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db;
+        let auth;
+        let isAuthReady = false;
+        
+        const CHAT_COLLECTION_PATH = `/artifacts/${appId}/public/data/chat_messages`;
+
+        const statusEl = document.getElementById('user-status');
+        const resetButtonEl = document.getElementById('reset-chat-button');
+        const feedbackEl = document.getElementById('feedback');
+
+        // -----------------------------------------------------
+        // 2. ユーティリティ関数
+        // -----------------------------------------------------
+
+        /**
+         * 処理結果をユーザーにフィードバックします。
+         */
+        function showFeedback(message, isError = false) {
+            feedbackEl.textContent = message;
+            feedbackEl.className = isError 
+                ? 'mt-4 p-3 rounded-lg text-white bg-red-500 text-left text-sm font-medium'
+                : 'mt-4 p-3 rounded-lg text-white bg-green-500 text-left text-sm font-medium';
+            feedbackEl.classList.remove('hidden');
+        }
+        
+        /**
+         * 認証状態に基づいてUIを更新します。
+         */
+        function updateUI(isAuthenticated, userId) {
+            isAuthReady = isAuthenticated;
+            resetButtonEl.disabled = !isAuthenticated;
+            
+            if (isAuthenticated) {
+                statusEl.textContent = `認証済みユーザーID: ${userId.substring(0, 8)}...`;
+                statusEl.classList.remove('text-red-500');
+                statusEl.classList.add('text-green-600');
+            } else {
+                statusEl.textContent = '認証に失敗しました。このツールは利用できません。';
+                statusEl.classList.add('text-red-500');
+            }
+        }
+
+        // -----------------------------------------------------
+        // 3. 認証処理
+        // -----------------------------------------------------
+
+        async function initializeFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    throw new Error("Firebase configが見つかりません。");
+                }
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // 認証が完了するまで待機
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        updateUI(true, user.uid);
+                    } else {
+                        updateUI(false, null);
+                    }
+                });
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+            } catch (error) {
+                console.error("Firebase初期化エラー:", error);
+                statusEl.textContent = `エラー: ${error.message}`;
+                updateUI(false, null);
+            }
+        }
+
+        // -----------------------------------------------------
+        // 4. リセット処理
+        // -----------------------------------------------------
+        
+        async function deleteAllMessages() {
+            if (!db || !isAuthReady) {
+                showFeedback("認証が完了していないか、データベースに接続されていません。", true);
+                return;
+            }
+
+            // Canvas環境ではwindow.confirm()は動作しませんが、ローカル環境での安全性のために残します。
+            // 実行環境（Canvas）では、このプロンプトはスキップされるか、フィードバックエリアに結果が表示されます。
+            if (!window.confirm('本当にチャットメッセージを全て削除しますか？この操作は元に戻せません。')) {
+                 showFeedback("リセットをキャンセルしました。", false);
+                return;
+            }
+
+            resetButtonEl.disabled = true;
+            resetButtonEl.textContent = '削除処理中...';
+            showFeedback('チャットメッセージの削除を開始します...', false);
+            
+            let deleteCount = 0;
+            try {
+                const q = query(collection(db, CHAT_COLLECTION_PATH));
+                const snapshot = await getDocs(q);
+                
+                for (const docSnapshot of snapshot.docs) {
+                    await deleteDoc(doc(db, CHAT_COLLECTION_PATH, docSnapshot.id));
+                    deleteCount++;
+                }
+
+                showFeedback(`チャット履歴(${deleteCount}件)をリセットしました！`);
+
+            } catch (error) {
+                console.error("メッセージの削除に失敗しました:", error);
+                showFeedback(`メッセージの削除に失敗しました。権限とネットワークを確認してください。 (${error.message})`, true);
+            } finally {
+                resetButtonEl.disabled = false;
+                resetButtonEl.textContent = 'チャットを完全にリセット';
+            }
+        }
+        
+        // -----------------------------------------------------
+        // 5. イベントリスナーと開始
+        // -----------------------------------------------------
+        
+        resetButtonEl.addEventListener('click', deleteAllMessages);
+
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>
