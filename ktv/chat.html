@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡易リアルタイムチャット</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* メッセージリストのスクロールバーを非表示にする（デザインを崩さないため） */
+        #messages {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #messages::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari, Opera */
+        }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center p-4">
+
+    <!-- メインチャットコンテナ (relative for modal positioning) -->
+    <div id="chat-container" class="relative bg-white w-full max-w-lg h-full max-h-[700px] flex flex-col rounded-xl shadow-2xl overflow-hidden">
+        
+        <!-- ヘッダー -->
+        <header class="p-4 bg-indigo-600 text-white shadow-md">
+            <!-- リセットボタンを削除しました -->
+            <h1 class="text-xl font-bold">ライブチャットルーム</h1>
+            <p id="user-info" class="text-sm opacity-90 mt-1"></p>
+        </header>
+
+        <!-- メッセージ表示エリア -->
+        <main id="messages" class="flex-grow p-4 space-y-4 overflow-y-auto">
+            <!-- ここにメッセージが動的に挿入されます -->
+            <div id="loading-indicator" class="text-center text-gray-500 py-8">
+                <svg class="animate-spin h-5 w-5 mr-3 text-indigo-500 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                チャットデータをロード中...
+            </div>
+        </main>
+
+        <!-- メッセージ入力フォーム -->
+        <footer class="p-4 border-t border-gray-200">
+            <div id="auth-error-message" class="text-red-600 text-sm mb-2 hidden">
+                認証エラーが発生しました。チャット機能は利用できません。
+            </div>
+            <form id="chat-form" class="flex gap-2">
+                <textarea 
+                    id="message-input" 
+                    class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 resize-none h-12" 
+                    placeholder="メッセージを入力してください..." 
+                    maxlength="200"
+                    required
+                ></textarea>
+                <button 
+                    id="send-button"
+                    type="submit" 
+                    class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled
+                >
+                    送信
+                </button>
+            </form>
+            <p class="text-xs text-gray-500 mt-2">Enterキーで送信、Shift+Enterで改行が可能です。</p>
+        </footer>
+
+        <!-- カスタムフィードバック/確認モーダル (alert/confirmの代替) -->
+        <div id="feedback-modal" class="hidden absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-10">
+            <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full">
+                <h3 id="modal-title" class="text-xl font-bold mb-3 text-gray-800">通知</h3>
+                <p id="modal-message" class="mb-6 text-gray-700">メッセージ</p>
+                <div id="modal-actions" class="flex justify-end space-x-3">
+                    <!-- アクションボタンがここに動的に挿入されます -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            orderBy, 
+            limit, 
+            onSnapshot, 
+            serverTimestamp,
+            // リセット関連のインポートを削除
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // -----------------------------------------------------
+        // 1. Firebase初期化とグローバル変数
+        // -----------------------------------------------------
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let db;
+        let auth;
+        let currentUserId = null;
+        let isAuthReady = false;
+
+        const messagesEl = document.getElementById('messages');
+        const formEl = document.getElementById('chat-form');
+        const inputEl = document.getElementById('message-input');
+        const sendButtonEl = document.getElementById('send-button');
+        const userInfoEl = document.getElementById('user-info');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const authErrorEl = document.getElementById('auth-error-message');
+
+        // カスタムモーダル要素
+        const feedbackModalEl = document.getElementById('feedback-modal');
+
+        // Firestoreのパブリックコレクションパス (コラボレーション用)
+        const CHAT_COLLECTION_PATH = `/artifacts/${appId}/public/data/chat_messages`;
+
+        // -----------------------------------------------------
+        // 2. ユーティリティ関数
+        // -----------------------------------------------------
+
+        function scrollToBottom() {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        /**
+         * alert()の代替 (シンプルなフィードバック)
+         */
+        function showFeedback(message) {
+            document.getElementById('modal-title').textContent = '通知';
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-actions').innerHTML = `
+                <button id="modal-ok" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow-md">OK</button>
+            `;
+            feedbackModalEl.classList.remove('hidden');
+            
+            document.getElementById('modal-ok').onclick = () => {
+                feedbackModalEl.classList.add('hidden');
+            };
+        }
+
+        // 確認モーダル関数はここでは不要なので削除
+
+        /**
+         * 認証状態に基づいてUIを更新します。
+         */
+        function updateUI(isAuthenticated) {
+            sendButtonEl.disabled = !isAuthenticated;
+            inputEl.disabled = !isAuthenticated;
+            
+            if (isAuthenticated) {
+                authErrorEl.classList.add('hidden');
+                userInfoEl.textContent = `あなたのID: ${currentUserId}`;
+            } else {
+                userInfoEl.textContent = '認証中...';
+            }
+        }
+
+        /**
+         * タイムスタンプを読みやすい形式にフォーマットします。
+         */
+        function formatTimestamp(timestamp) {
+            let date;
+            if (timestamp && typeof timestamp.toDate === 'function') {
+                date = timestamp.toDate();
+            } else if (typeof timestamp === 'number') {
+                date = new Date(timestamp);
+            } else {
+                return '';
+            }
+            
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // -----------------------------------------------------
+        // 3. 認証処理
+        // -----------------------------------------------------
+
+        async function initializeFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config is missing or empty.");
+                    authErrorEl.textContent = "設定が見つかりません。アプリケーションIDをご確認ください。";
+                    authErrorEl.classList.remove('hidden');
+                    updateUI(false);
+                    return;
+                }
+                
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                        isAuthReady = true;
+                        console.log("Firebase Auth Ready. User ID:", currentUserId);
+                        updateUI(true);
+                        startChatListener();
+                    } else {
+                        if (!initialAuthToken) {
+                            await signInAnonymously(auth);
+                        }
+                    }
+                });
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                }
+
+            } catch (error) {
+                console.error("Firebase初期化または認証エラー:", error);
+                authErrorEl.textContent = `認証エラー: ${error.message}`;
+                authErrorEl.classList.remove('hidden');
+                updateUI(false);
+            }
+        }
+
+
+        // -----------------------------------------------------
+        // 4. Firestore処理
+        // -----------------------------------------------------
+
+        function createMessageElement(docData) {
+            const isMe = docData.userId === currentUserId;
+            const messageClass = isMe 
+                ? 'bg-indigo-500 text-white ml-auto rounded-br-none' 
+                : 'bg-gray-200 text-gray-800 rounded-tl-none';
+            
+            const alignmentClass = isMe ? 'justify-end' : 'justify-start';
+            const displayUserId = isMe ? 'あなた' : docData.userId.substring(0, 8);
+            const timestampText = formatTimestamp(docData.timestamp);
+            
+            const safeMessage = docData.message
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            
+            return `
+                <div class="flex ${alignmentClass}">
+                    <div class="max-w-[80%] flex flex-col">
+                        <span class="text-xs ${isMe ? 'text-right' : 'text-left'} text-gray-500 mb-0.5">
+                            ${displayUserId}
+                        </span>
+                        <div class="p-3 ${messageClass} rounded-xl shadow-sm break-words whitespace-pre-wrap">
+                            ${safeMessage}
+                        </div>
+                        <span class="text-xs ${isMe ? 'text-right' : 'text-left'} text-gray-400 mt-0.5">
+                            ${timestampText}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startChatListener() {
+            if (!db || !isAuthReady) return;
+
+            const q = query(
+                collection(db, CHAT_COLLECTION_PATH),
+                orderBy('timestamp', 'desc'), 
+                limit(50)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                loadingIndicator.classList.add('hidden');
+                
+                const initialScrollNeeded = messagesEl.scrollHeight - messagesEl.clientHeight <= messagesEl.scrollTop + 50;
+
+                const currentMessages = snapshot.docs
+                    .map(doc => createMessageElement(doc.data()))
+                    .reverse()
+                    .join('');
+                    
+                messagesEl.innerHTML = currentMessages;
+
+                if (initialScrollNeeded) {
+                    scrollToBottom();
+                }
+
+                console.log(`チャットメッセージを更新しました。メッセージ数: ${snapshot.size}`);
+
+            }, (error) => {
+                console.error("Firestoreリスナーエラー:", error);
+                loadingIndicator.textContent = "メッセージのロード中にエラーが発生しました。";
+            });
+        }
+        
+        async function sendMessage(message) {
+            if (!currentUserId || !db) {
+                console.error("認証が完了していないため、メッセージを送信できません。");
+                showFeedback("メッセージの送信に失敗しました。認証状態を確認してください。");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, CHAT_COLLECTION_PATH), {
+                    userId: currentUserId,
+                    message: message,
+                    timestamp: serverTimestamp() 
+                });
+                console.log("メッセージが正常に送信されました。");
+            } catch (error) {
+                console.error("メッセージの送信に失敗しました:", error);
+                showFeedback("メッセージの送信に失敗しました。ネットワーク接続を確認してください。");
+            }
+        }
+        
+        // deleteAllMessages 関数は削除しました
+
+        // -----------------------------------------------------
+        // 5. イベントリスナー
+        // -----------------------------------------------------
+
+        formEl.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = inputEl.value.trim();
+
+            if (message) {
+                sendMessage(message);
+                inputEl.value = '';
+                inputEl.focus();
+            }
+        });
+
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!sendButtonEl.disabled) {
+                    formEl.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+        
+        // リセットボタンのイベントリスナーを削除しました
+        
+        // -----------------------------------------------------
+        // 6. アプリケーション開始
+        // -----------------------------------------------------
+
+        window.onload = initializeFirebase;
+
+    </script>
+</body>
+</html>
