@@ -71,7 +71,8 @@ p {
   background-color: #333333;
   color: white;
   padding: 10px 15px;
-  text-decoration: non
+  text-decoration: none;
+  font-size: 8px;
 }
 
 h1 {
@@ -101,6 +102,13 @@ h3 {
     border: 2px solid #ff0000;
     margin: 20px;
     float: left;
+}
+@media (max-width: 600px) {
+  .live {
+    float: none;
+    text-align: center;
+    margin: 10px;
+  }
 }
 
 .live_preview {
@@ -135,11 +143,22 @@ h3 {
   margin-top: 20px;
   float: left;
 }
+@media (max-width: 600px) {
+  .program {
+    text-align: center;
+  }
+}
 
 .to {
   clear: both;
   margin-left: 20px;
   margin-top: 400px;
+}
+@media (max-width: 600px) {
+  .to {
+    text-align: center;
+    margin: 10px;
+  }
 }
 
 
@@ -184,6 +203,12 @@ h3 {
   font-size: 15px;
   margin-left: 20px;
   margin-top: 30px;
+}
+@media (max-width: 600px) {
+  .whats {
+    text-align: center;
+    margin: 10px;
+  }
 }
 
 .whatstext {
