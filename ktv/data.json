@@ -4,7 +4,7 @@
       "url": "https://www.youtube.com/embed/xxxx",
       "height": 315
     },
-    "img": "./image/sample.png"
+    "img": "sample.png"
   },
   "live": {
     "iframe": {
