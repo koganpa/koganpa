@@ -135,7 +135,7 @@ h1 {
 
   .chat {
     width: 100vw;
-    height: 600px; /* 可変でもいい */
+    height: auto; /* 可変でもいい */
     border: none;
   }
 }
@@ -177,6 +177,7 @@ h1 {
   background: #ffcc33;
   color: #000000;
 }
+
 
 
 
