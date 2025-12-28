@@ -97,7 +97,6 @@ h1 {
 
 .player {
   border: #939393 5px solid;
-  margin-top: 20px;
   margin-left: 20px;
   display: inline-block;
 }
@@ -178,4 +177,5 @@ h1 {
   background: #ffcc33;
   color: #000000;
 }
+
 
