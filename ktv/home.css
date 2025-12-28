@@ -140,7 +140,6 @@ h3 {
 
 .program {
   margin-left: 20px;
-  margin-top: 20px;
   float: left;
 }
 @media (max-width: 600px) {
@@ -216,3 +215,4 @@ h3 {
   margin-left: 15px;
   font-size: 15px;
 }
+
