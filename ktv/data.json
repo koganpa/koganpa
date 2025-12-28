@@ -1,0 +1,20 @@
+{
+  "home": {
+    "iframe": {
+      "url": "https://www.youtube.com/embed/xxxx",
+      "height": 315
+    },
+    "img": "images/top_2025.png"
+  },
+  "live": {
+    "iframe": {
+      "url": "https://www.youtube.com/embed/yyyy",
+      "height": 360
+    },
+    "title": "コガテレ大晦日SP",
+    "explanations": [
+      "23:30〜配信開始！",
+      "年越しカウントダウンやるぜ！"
+    ]
+  }
+}
