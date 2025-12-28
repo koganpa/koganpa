@@ -9,7 +9,7 @@ fetch("data.json")
       iframe.src = h.iframe.url;
       iframe.height = h.iframe.height;
 
-      document.getElementById("home-img").src = h.img;
+      document.getElementById("home-img").src = "sample.png";
     }
 
     if (page === "live") {
