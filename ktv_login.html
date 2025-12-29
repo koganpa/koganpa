@@ -16,7 +16,8 @@ const USERS = {
   "hakaishin_sota": "sota0827",
   "たぼたん": "turbomode",
   "考えときます": "考えときます",
-  "kazu": "Tung Tung Tung Tung Safur"
+  "kazu": "Tung Tung Tung Tung Safur",
+  "testuser": "testuser"
 };
 
 const REDIRECT = "https://koganpa.github.io/koganpa/ktv/home.html";  // ログイン成功後の遷移先
@@ -29,7 +30,6 @@ const pass = prompt("パスワードを入力してください。");
 
 // ユーザー名の存在とパスワードチェック
 if (USERS[user] && USERS[user] === pass) {
-  alert("ようこそ！OKボタンを押して下さい。");
   location.href = REDIRECT;
 } else {
   alert("ログインに失敗しました。もう一度お試しください。");
@@ -39,6 +39,7 @@ if (USERS[user] && USERS[user] === pass) {
 
 </body>
 </html>
+
 
 
 
