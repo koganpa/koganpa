@@ -163,6 +163,7 @@ h1 {
 @media (max-width: 1100px) {
   .explanation, .program, .check {
     text-align: center;  /* 画面幅が600px以下の場合は非表示 */
+    margin: 10px;
   }
 }
 
@@ -182,6 +183,7 @@ h1 {
   background: #ffcc33;
   color: #000000;
 }
+
 
 
 
