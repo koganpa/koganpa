@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>勉強用アプリ</title>
+        <script>
+        window.onload = function () {
+            // ===== タイマー系 =====
+            const countdown = document.getElementById("countdown");
+            const startBtn = document.getElementById("start");
+            const stopBtn = document.getElementById("stop");
+            const roundText = document.getElementById("round");
+            const progressBar = document.getElementById("progress-bar");
+            const totalTimeText = document.getElementById("total-time");
+            const totaltimeResetBtn = document.getElementById("totaltime-reset");
+            const todoList = document.getElementById("todo-list");
+            const addTodoBtn = document.getElementById("add-todo");
+            const examArea = document.getElementById("exam-area");
+            const examModalBg = document.getElementById("exam-modal-bg");
+
+            let totalSeconds = Number(localStorage.getItem("totalSeconds")) || 0;
+            let maxTime = 1500;
+            let round = 1;
+            let mode = "work";
+            let timeLeft = 1500;
+            let timerId = null;
+            let todos = JSON.parse(localStorage.getItem("todos")) || [];
+            todos = JSON.parse(localStorage.getItem("todos")) || [];
+            let editingIndex = null;
+            let examDate = localStorage.getItem("examDate");
+            let examName = localStorage.getItem("examName");
+
+
+            function renderTodo() {
+                todoList.innerHTML = "";
+
+                todos.forEach((todo, index) => {
+                    const li = document.createElement("li");
+                    if (todo.done) {
+                        li.classList.add("done");
+                    }
+
+                    li.innerHTML = `
+                        <label>
+                            <input type="checkbox" ${todo.done ? "checked" : ""}>
+                            ${todo.text} [${todo.type}]
+                        </label>
+                        <button>削除</button>
+                    `;
+
+                    // チェック
+                    li.querySelector("input").onchange = (e) => {
+                        todos[index].done = e.target.checked;
+
+                        if (e.target.checked) {
+                            li.classList.add("done");
+                        } else {
+                            li.classList.remove("done");
+                        }
+                        localStorage.setItem("todos", JSON.stringify(todos));
+                    };
+
+
+                    // 削除
+                    li.querySelector("button").onclick = () => {
+                        todos.splice(index, 1);
+                        localStorage.setItem("todos", JSON.stringify(todos));
+                        renderTodo();
+                    };
+
+                    todoList.appendChild(li);
+                });
+            }
+            renderTodo();
+
+            function updateDisplay() {
+                const min = Math.floor(timeLeft / 60);
+                const sec = timeLeft % 60;
+                countdown.textContent =
+                    `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+                progressBar.style.width = (timeLeft / maxTime) * 100 + "%";
+            }
+
+            function updateTotalTimeDisplay() {
+                const h = Math.floor(totalSeconds / 3600);
+                const m = Math.floor((totalSeconds % 3600) / 60);
+                const s = totalSeconds % 60;
+                totalTimeText.textContent = `${h}時間 ${m}分 ${s}秒`;
+            }
+
+            function updateRound() {
+                roundText.textContent = `ただいま ${round}周目`;
+            }
+
+            function renderExamCountdown() {
+                examArea.innerHTML = "";
+
+                if (!examDate) {
+                    examArea.innerHTML = `
+                        <div class="exam-bar">
+                            <button onclick="openExamModal()"
+                            style="font-size:15px; padding:6px 12px; border-radius:5px;
+                            background: transparent; color: #ffffff; border: 0.5px solid #dcdcdc; cursor:pointer;">
+                                カウントダウン 新規作成
+                            </button>
+                        </div>
+                    `;
+
+                    return;
+                }
+
+                const today = new Date();
+                const exam = new Date(examDate);
+                const diff = Math.floor((exam - today) / (1000 * 60 * 60 * 24));
+                if (diff < 0) {
+                    localStorage.removeItem("examDate");
+                    localStorage.removeItem("examName");
+                    examDate = null;
+                    renderExamCountdown();
+                    return;
+                }
+
+                examArea.innerHTML = `
+                    <div class="exam-bar">
+                        <p>${examName}まで</p>
+                        <p style="font-size:24px; margin:0; color:#ff0000;">
+                            あと <strong>${diff}</strong> 日
+                        </p>
+                        <button onclick="openExamModal()"
+                        style="font-size:12px; padding:4px 10px; border-radius:5px;
+                        background: #374151; color: #e5e7eb; border:none; cursor:pointer;">
+                            変更
+                        </button>
+                    </div>
+                `;
+
+            }
+
+            startBtn.onclick = () => {
+                if (timerId) return;
+                timerId = setInterval(() => {
+                    timeLeft--;
+                    totalSeconds++;
+                    localStorage.setItem("totalSeconds", totalSeconds);
+                    updateDisplay();
+                    updateTotalTimeDisplay();
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timerId);
+                        timerId = null;
+                        if (mode === "work") {
+                            mode = "break";
+                            timeLeft = 300;
+                            maxTime = 300;
+                        } else {
+                            mode = "work";
+                            timeLeft = 1500;
+                            maxTime = 1500;
+                            round++;
+                            updateRound();
+                        }
+                        updateDisplay();
+                        startBtn.onclick();
+                    }
+                }, 1000);
+            };
+
+            stopBtn.onclick = () => {
+                clearInterval(timerId);
+                timerId = null;
+            };
+
+            totaltimeResetBtn.onclick = () => {
+                if (confirm("本当にリセットしますか？この操作は元に戻せません。")) {
+                    totalSeconds = 0;
+                    localStorage.setItem("totalSeconds", 0);
+                    updateTotalTimeDisplay();
+                }
+            };
+
+            addTodoBtn.onclick = () => {
+                modalBg.style.display = "flex";
+                document.getElementById("modal-todo").value = "";
+                document.getElementById("modal-type").value = "宿題";
+            };
+
+
+            updateDisplay();
+            updateTotalTimeDisplay();
+
+            // ===== モーダル系 =====
+            const modalBg = document.getElementById("modal-bg");
+            const closeBtn = document.getElementById("close");
+            const saveBtn = document.getElementById("save");
+
+            closeBtn.onclick = () => {
+                modalBg.style.display = "none";
+            };
+
+            saveBtn.onclick = () => {
+                const text = document.getElementById("modal-todo").value;
+                const type = document.getElementById("modal-type").value;
+
+                if (!text) return;
+
+                todos.push({
+                    text,
+                    type,
+                    done: false
+                });
+
+                localStorage.setItem("todos", JSON.stringify(todos));
+                modalBg.style.display = "none";
+                renderTodo();
+            };
+
+
+            // グローバルに公開（HTMLのonclick用）
+            window.openModal = function (index) {
+                editingIndex = index;
+                const todo = todos[index];
+
+                modalBg.style.display = "flex";
+                document.getElementById("modal-todo").value = todo.text;
+                document.getElementById("modal-type").value = todo.type;
+            };
+            window.openExamModal = function () {
+                examModalBg.style.display = "flex";
+            };
+
+            window.closeExamModal = function () {
+                examModalBg.style.display = "none";
+            };
+
+
+            window.deleteExam = function () {
+                localStorage.removeItem("examDate");
+                examDate = null;
+                renderExamCountdown();
+            };
+
+            document.getElementById("exam-save").onclick = () => {
+                const date = document.getElementById("exam-date").value;
+                const name = document.getElementById("exam-name").value || "試験";
+
+                if (!date) return;
+
+                localStorage.setItem("examDate", date);
+                localStorage.setItem("examName", name);
+
+                examDate = date;
+                examName = name;
+
+                closeExamModal();
+                renderExamCountdown();
+            };
+
+            document.getElementById("exam-delete").onclick = () => {
+                if (!confirm("このカウントダウンを削除しますか？")) return;
+
+                localStorage.removeItem("examDate");
+                localStorage.removeItem("examName");
+
+                examDate = null;
+                examName = null;
+
+                closeExamModal();
+                renderExamCountdown();
+            };
+
+            renderTodo();
+            renderExamCountdown();
+        };
+        </script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap');
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: "M PLUS 1p";
+            }
+
+            body {
+                background: #0f1115;
+                color: #e6e6e6;
+            }
+
+            header {
+                background-color: #101010;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            }
+            
+            .header-appname {
+                color: #ffffff;
+                font-size: 20px;
+                text-align: center;
+            }
+
+            .timer-back {
+                background: #111827;
+                height: auto;
+                text-align: center;
+            }
+
+            .timer {
+                font-size: 80px;
+            }
+
+            #progress-container {
+                width: 100vw;
+                height: 8px;
+                background: #ddd;
+                overflow: hidden;
+                margin-top: 20px;
+            }
+
+            #progress-bar {
+                height: 100%;
+                width: 100%;
+                background: #4caf50;
+                transition: width 0.3s linear;
+            }
+
+            #start {
+                font-size: 20px;
+                margin: 10px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 14px;
+                cursor: pointer;
+                background: #2563eb;
+                color: #ffffff;
+            }
+            #stop {
+                font-size: 20px;
+                margin: 10px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 14px;
+                cursor: pointer;
+                background: #dc2626;
+                color: #ffffff;
+            }
+            .totaltime-bgm {
+                background: #111827;
+                height: auto;
+                text-align: center;
+                padding: 20px 0;
+                display: flex;
+                justify-content: center;   /* 中央寄せ */
+                align-items: center;       /* 高さ揃える */
+                gap: 20px;                 /* 間隔 */
+                border-bottom: 0.1px solid #333333;
+            }
+
+            #total-time {
+                font-size: 25px;
+                margin: 10px 0;
+            }
+            #totaltime-reset {
+                font-size: 10px;
+                margin-top: 10px;
+                padding: 2px 8px;
+                border: 1px solid #ff0000;
+                border-radius: 5px;
+                cursor: pointer;
+                background-color: #ffff00;
+                color: #ff6600;
+            }
+
+            .exam-bar {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+                background: #111827;
+                height: 56px;          /* ← ここで統一 */
+                box-sizing: border-box;
+                border-bottom: 0.1px solid #333333;
+            }
+
+            #exam-modal-bg {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.4);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 20000;
+            }
+
+            #exam-modal {
+                background: #212121;
+                padding: 20px;
+                border-radius: 10px;
+                width: 280px;
+                text-align: center;
+            }
+            #modal-bg {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.4);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 20000;
+            }
+
+            #modal {
+                background: #212121;
+                padding: 20px;
+                border-radius: 10px;
+                width: 300px;
+                text-align: center;
+            }
+            .done {
+                text-decoration: line-through;
+                color: #888;
+            }
+
+            .todo-back {
+                position: relative;
+                padding: 20px;
+                height: auto;
+                text-align: center;
+            }
+            #add-todo {
+                bottom: 20px;
+                right: 20px;
+                font-size: 10px;
+                padding: 2px 6px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                background: transparent;
+                color: #ffffff;
+                border: 0.5px solid #dcdcdc;
+                margin-bottom: 10px;
+            }
+
+            label {
+                font-size: 15px;
+            }
+        </style>
+    </head>
+<body>
+    <header>
+        <p class="header-appname">勉強用アプリ by koganpa</p>
+    </header>
+    <div class="timer-back">
+        <div id="countdown" class="timer">25:00</div>
+        <button id="start">START</button>
+        <button id="stop">STOP</button>
+        <p id="round">ただいま 1周目</p>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+    <div class="totaltime-bgm">
+        <div class="totaltime-back">
+            <p>総勉強時間</p>
+            <p id="total-time">0時間 0分 0秒</p>
+            <button id="totaltime-reset">総勉強時間をリセット</button>
+        </div>
+        <iframe data-testid="embed-iframe" style="border-radius:12px" class="bgm" src="https://open.spotify.com/embed/playlist/0BeIkSkqBSshYl9VTkgpMR?utm_source=generator&theme=0" 
+        width="40%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div id="exam-area"></div>
+    <div id="exam-modal-bg" style="display:none;">
+        <div id="exam-modal">
+            <h3>カウントダウン作成</h3>
+            <label>
+                試験名：<input id="exam-name" placeholder="定期テスト・英検など">
+            </label>
+            <br><br>
+            <label>
+                試験日：<input type="date" id="exam-date">
+            </label>
+            <br><br>
+            <button id="exam-save">保存</button>
+            <button id="exam-delete" style="color:red">削除</button>
+            <button onclick="closeExamModal()">キャンセル</button>
+            <p>※未作成で削除ボタンを押しても無意味です。</p>
+        </div>
+    </div>
+    <div class="todo-back">
+        <button id="add-todo">やるべきリスト新規作成</button>
+        <ul id="todo-list" style="list-style: none;"></ul>
+    </div>
+    <div id="modal-bg">
+        <div id="modal">
+            <h3>ToDo編集</h3>
+            <label>
+                やるべきこと:
+                <input id="modal-todo">
+            </label><br>
+            <label>
+                内容：
+                <select id="modal-type">
+                    <option>宿題</option>
+                    <option>自主学習</option>
+                    <option>その他</option>
+                </select>
+            </label><br>
+            <button id="save">保存</button>
+            <button id="close">キャンセル</button>
+        </div>
+    </div>
+</body>
+</html>
