@@ -5,15 +5,14 @@ body {
 
 .container {
     display: grid;
-    /* 横幅の比率を 2:3 に設定 */
     grid-template-columns: 3fr 1fr;
-    /* 高さの比率を 3:2 に設定（図の左側と右側の数字に対応） */
     grid-template-rows: 3fr 1fr;
-    gap: 10px; /* ボックス間の隙間 */
-    width: 95vw; /* 全体の幅（調整可能） */
-    height: 95vh; /* 全体の高さ（調整可能） */
+    gap: 10px;
+    width: 95vw;
+    height: 95vh;
     margin: 20px auto;
 }
+
 .time {
     border: 2px solid #333;
     display: flex;
@@ -41,37 +40,72 @@ body {
 .weather {
     border: 2px solid #333;
     background-color: #303030;
-    font-weight: bold;
     display: flex;
-    flex-direction: column;
     align-items: stretch;
-    justify-content: flex-start;
-    flex-direction: row; /* 横並び */
-    align-items: flex-start; /* 上揃え */
-    gap: 16px; /* テーブル間の隙間 */
-    padding: 10px; /* 必要なら */
+    justify-content: stretch;
+    gap: 8px;             /* テーブル間の隙間 */
+    padding: 1px;         /* 内側余白を削減 */
     box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
+}
+
+.weather-container {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: stretch;
 }
 
 .weather table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    flex: 1;
+    border-collapse: collapse;
     table-layout: fixed;
+    font-size: 1.5vw;    /* 小さめにして縦収縮 */
+    min-width: 0;
+}
+
+.weather th, .weather td {
+    padding: 4px 6px;    /* 内側余白を削減 */
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1.2;    /* 行間を詰める */
     color: #ffffff;
-    font-family: 'Noto Sans JP', sans-serif;
+    border-right: 1px solid #555;
+}
+
+.weather th:last-child, .weather td:last-child {
+    border-right: none;
 }
 
 .weather th {
-    background: linear-gradient(90deg, #3a3a3a, #1a1a1a);
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 1.1rem;
-    padding: 12px 0;
-    text-align: center;
+    background-color: #1a1a1a;
+    font-weight: bold;
 }
 
+.weather td {
+    background-color: #2a2a2a;
+}
 
+#daily-table { flex: 2; }
+#hourly-table { flex: 3; }
+#daily-table tr, #hourly-table tr { height: auto; } /* 固定高さをやめる */
+
+#daily-table td, #hourly-table td {
+    text-align: center;
+    vertical-align: middle;
+    white-space: normal;   /* 改行許可 */
+    word-break: break-word;/* 長い文字も折り返す */
+    font-size: 1.8vw;      /* 必要に応じて少し小さく */
+    line-height: 1.2em;    /* 行間を詰めすぎない */
+}
+
+#daily-table tr, #hourly-table tr {
+    height: auto;          /* 高さをコンテンツに合わせる */
+}
 
 .box {
     border: 2px solid #333;
@@ -80,36 +114,4 @@ body {
     justify-content: center;
     font-weight: bold;
     background-color: #303030;
-}
-
-.weather-container {
-  display: flex;
-  gap: 16px;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-
-#daily-table tr,
-#hourly-table tr {
-    height: 90px; /* ここを同じ高さに揃える */
-}
-
-/* テーブル全体の幅調整 */
-#daily-table {
-    width: 40%;  /* 左側 */
-}
-#hourly-table {
-    width: 60%;  /* 右側 */
-}
-
-/* テーブルのセル内文字は中央寄せ */
-#daily-table td, #hourly-table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-th, td {
-  border: 1px solid #555;
-  padding: 8px;
-  font-size: 2vw;
 }
