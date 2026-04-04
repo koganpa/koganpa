@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-family: Noto Sans JP;
+}
+
+.copyright, .form {
+  text-align: center;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #171717;
+}
+
+@media screen and (max-width: 480px) {
+  .header-nav-list {
+    display: none;
+  }
+
+  .header-nav {
+    margin: 0 0 0 auto;
+  }
+
+  .header-ham {
+    display: block;
+  }
+}

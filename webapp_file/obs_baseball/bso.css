@@ -1,0 +1,196 @@
+html {
+    width: 300px;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#scoreboard {
+    width: 300px; 
+    height: 200px; 
+    font-family: sans-serif;
+    color: white;
+    background: linear-gradient(to right, #101010, #404040);
+    display: grid;
+    grid-template-columns: 180px 200px; 
+    grid-template-rows: 100%; 
+    padding: 5px;
+    box-sizing: border-box;
+    border: 5px solid #000000;
+    border-radius: 12px;
+}
+
+#inning-display {
+    position: absolute; 
+    top: 5px;
+    left: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 10;
+    font-family: Noto Sans JP;
+    font-weight: normal;
+}
+#inning-half {
+    color: white;
+    margin-left: 5px;
+    font-size: 16px;
+}
+
+#score-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0;
+    width: 120px;
+    padding-top: 25px; 
+    padding-left: 5px;
+}
+
+.team-score {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 70px; 
+    padding: 0 10px;
+    border-radius: 3px;
+    box-sizing: border-box;
+    justify-content: space-between;
+    transition: background-color 0.2s, border 0.2s;
+    border: 2px solid transparent;
+}
+
+.active-team {
+    border-color: #ff0000;
+    background-color: rgba(255, 0, 0, 0.12);
+}
+
+.visitor, .home {
+    display: flex;
+    background-color: #333333;
+    background-color: #333333;
+}
+
+.team-logo {
+    font-size: 25px;
+    width: 40px;
+    min-width: 30px;
+    max-width: 80px;
+    text-align: center;
+    font-family: "Noto Sans JP";
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.home .team-logo {
+    color: white; 
+}
+
+.score {
+    font-size: 40px;
+    font-family: Arial;
+}
+
+/* --- 右側エリア (塁状況、BSO) --- */
+#status-area {
+    display: flex;
+    flex-flow: column;
+    align-items: center; /* 垂直方向の中央揃え */
+    padding: 5px 0;
+    width: 60px;
+}
+
+#bases {
+    /* order: 1; は不要 */
+    position: relative;
+    width: 90px; 
+    height: 75px;
+    margin: 0; /* flexアイテムとして機能させるためマージンをリセット */
+    /* BSOエリアと垂直に揃えるためにtopを調整 */
+    align-self: center;
+    margin-top: 2px;
+    --base-offset: 25px; /* 4隅の距離を一定に保つためのオフセット */
+}
+
+.base {
+    width: 24px;
+    height: 24px;
+    border: 2px solid white;
+    background-color: #333333;
+    border-radius: 3px;
+    position: absolute;
+    transition: background-color 0.2s;
+    transform: rotate(4deg);
+    transform: skew(30deg,30deg);
+}
+.on-base {
+    background-color: #ffcc00; 
+}
+
+/* 菱形の配置（塁間が等距離になるように固定オフセットを使用） */
+#base-1 {
+    top: 50%;
+    left: calc(50% + var(--base-offset));
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+#base-2 {
+    top: calc(50% - var(--base-offset));
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+#base-3 {
+    top: 50%;
+    left: calc(50% - var(--base-offset));
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+
+/* BSO (ボール/ストライク/アウト) (右側) */
+#bso-area {
+    /* order: 2; は不要 */
+    width: 120px; /* BSOエリアの幅を固定 */
+    height: 100px; /* 親の高さに合わせて調整 */
+    display: flex;
+    flex-direction: column; /* B, S, Oは縦に並べる */
+    justify-content: center;
+    gap: 15px;
+    padding-left: 0; /* flex-direction: row のため不要 */
+}
+
+.bso-row {
+    display: flex;
+    align-items: center;
+    height: 20px;
+}
+
+.bso-label {
+    font-weight: bold;
+    font-size: 16px;
+    width: 15px;
+    text-align: right;
+    margin-right: 3px;
+    font-family: Noto Sans JP;
+    font-weight: normal;
+}
+
+.bso-count {
+    display: flex;
+    gap: 3px;
+}
+
+.bso-dot {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #333; 
+    border: 2px solid white;
+    transition: background-color 0.2s;
+}
+
+.ball.active { background-color: #4CAF50; } 
+.strike.active { background-color: #FFEB3B; } 
+.out.active { background-color: #F44336; }

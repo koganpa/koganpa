@@ -29,7 +29,7 @@ main {
   max-width: 100%;
 }
 
-.simple_notepad_icon {
+.bso_icon {
   display: block;
   margin: auto;
   margin-top: 100px;
@@ -52,13 +52,17 @@ main {
   text-align: center;
   font-weight: normal;
   font-size: 30px;
-  margin: 0;
+  margin-top: 0;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .catchcopy {
   text-align: center;
   font-size: 15px;
   margin-top: 18px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .download-div {
@@ -114,7 +118,7 @@ main {
   margin: auto;
 }
 
-.simple_notepad_screenshot {
+.bso_screenshot {
   max-width: 200px;
   float: right;
 }
@@ -126,7 +130,7 @@ main {
     width: 85vw;
   }
 
-  .simple_notepad_screenshot {
+  .bso_screenshot {
     float: none;
     margin-top: 20px;
     max-width: 85vw;
@@ -152,6 +156,7 @@ table {
   margin-top: 30px;
   border: rgba(255, 255, 255, 0.50) solid 2px; /* テーブルの枠線 */
 }
+
 @media (max-width: 480px) {
 table {
     width: 85vw;
@@ -217,6 +222,7 @@ th, td {
   bottom: 0;
   z-index: 1000;
 }
+
 
 @keyframes fadeIn {
   0% {

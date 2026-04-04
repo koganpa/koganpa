@@ -27,13 +27,24 @@ p, h1 {
   text-align: center;
   margin-top: 125px;
 }
+@media (max-width: 480px) {
+  .welcome {
+    font-size: 25px;
+  }
+}
 
 .explanation {
   margin-top: 10px;
   text-align: center;
 }
+@media (max-width: 480px) {
+  .explanation {
+    font-size: 15px;
+    margin: 10px;
+  }
+}
 
-.windowsbox, .applebox, .googlebox, .ktvbox {
+.windowsbox, .applebox, .googlebox, .webappbox {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -46,15 +57,26 @@ p, h1 {
   width: 80%;
   overflow: hidden;
   margin-bottom: 10px;
-  background-color: #808080;
+  background-color: #505050;
 }
+.windowsbox:hover, .applebox:hover, .googlebox:hover, .webappbox:hover {
+  border: solid 3px #FFFFFF;
+  color: #FFFFFF;
+  transition: border 0.3s ease, color 0.3s ease;
+}
+@media (max-width: 480px) {
+  .windowsbox, .applebox, .googlebox, .webappbox {
+    width: 80vw;
+  }
+}
+
 
 .windowsbox {
   color: #0078D7;
   border: solid 3px #0078D7;
 }
 
-.applebox {
+/*.applebox {
   color: #696969;
   border: solid 3px #696969;
 }
@@ -62,11 +84,11 @@ p, h1 {
 .googlebox {
   color: #3DDC84;
   border: solid 3px #3DDC84;
-}
+}*/
 
-.ktvbox {
-  color: #006ca2;
-  border: solid 3px #006ca2;
+.webappbox {
+  color: #F15A22;
+  border: solid 3px #F15A22;
 }
 
 /* aタグをflex中央揃え＆範囲限定 */
@@ -82,7 +104,7 @@ p, h1 {
 
 .windows-logo,
 .google-logo,
-.ktv-logo {
+.webapp-logo {
   width: 37.5px;
   height: 37.5px;
 }
@@ -124,19 +146,18 @@ p, h1 {
 
 .sorry {
   text-align: center;
+  font-size: 12px;
+  margin: 10px;
 }
 
-.copyright, .form {
-  text-align: center;
-  text-decoration: none;
-}
-
-footer {
-  position: absolute;
+.footer-iframe {
+  width: 100%;
+  height: 100px;
+  border: none;
+  position: fixed;
   left: 0;
   bottom: 0;
-  width: 100%;
-  background-color: #171717;
+  z-index: 1000;
 }
 
 @keyframes fadeIn {

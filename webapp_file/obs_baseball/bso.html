@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>OBS用野球テロップ</title>
+    <link rel="stylesheet" href="bso.css">
+</head>
+<body>
+    <div id="scoreboard">
+        <div id="inning-display">
+            <span id="inning-num">8</span>
+            <span id="inning-half">表</span>
+        </div>
+        <div id="score-area">
+            <div class="team-score visitor active-team">
+                <input type="text" class="team-logo" value="A" style="border:none; outline:none; background:transparent; color:#ffffff;">
+                <span id="score-visitor" class="score">5</span>
+            </div>
+            <div class="team-score home">
+                <input type="text" class="team-logo" value="B" style="border:none; outline:none; background:transparent; color:#ffffff;">
+                <span id="score-home" class="score">2</span>
+            </div>
+        </div>
+        <div id="status-area">
+            <div id="bases">
+                <div id="base-2" class="base"></div>
+                <div id="base-3" class="base"></div>
+                <div id="base-1" class="base on-base"></div>
+            </div>
+            
+            <div id="bso-area">
+                <div class="bso-row">
+                    <div class="bso-label">B</div>
+                    <div id="balls" class="bso-count">
+                        <div class="bso-dot ball active"></div>
+                        <div class="bso-dot ball active"></div>
+                        <div class="bso-dot ball"></div>
+                    </div>
+                </div>
+                <div class="bso-row">
+                    <div class="bso-label">S</div>
+                    <div id="strikes" class="bso-count">
+                        <div class="bso-dot strike active"></div>
+                        <div class="bso-dot strike active"></div>
+                    </div>
+                </div>
+                <div class="bso-row">
+                    <div class="bso-label">O</div>
+                    <div id="outs" class="bso-count">
+                        <div class="bso-dot out"></div>
+                        <div class="bso-dot out"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="bso.js"></script>
+</body>
+</html>
