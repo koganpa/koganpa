@@ -8,6 +8,10 @@ body {
   background-color: #212121;
 }
 
+*, *::before, *::after {
+    font-family: "Noto Sans JP", sans-serif;
+}
+
 p,
 h1,
 div {
