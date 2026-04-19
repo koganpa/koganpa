@@ -76,15 +76,18 @@ body {
 
 .team-logo {
     font-size: 25px;
-    width: 40px;
-    min-width: 30px;
-    max-width: 80px;
+    width: 3ch;
     text-align: center;
     font-family: "Noto Sans JP";
     font-style: italic;
     white-space: nowrap;
     overflow: hidden;
     box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0;
+    border: none;
+    min-width: 0;
 }
 .home .team-logo {
     color: white; 
