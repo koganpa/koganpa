@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>池田16歳誕生日記念動画 特設視聴ページ</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Noto Sans JP", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0f1117;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            width: 100%;
+            background-color: #f8fcff;
+            padding: 12px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-logo {
+            height: 48px;
+            width: auto;
+            max-width: 90%;
+            object-fit: contain;
+        }
+
+        main {
+            width: 100%;
+            max-width: 960px;
+            padding: 30px 16px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tagline {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #a0a8c0;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        h1.title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.08em;
+            margin-bottom: 24px;
+        }
+
+        #video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #000000;
+        }
+
+        #player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 17, 23, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+
+        #overlay-status {
+            font-size: 0.95rem;
+            color: #a0a8c0;
+            margin-bottom: 16px;
+        }
+
+        #join-btn {
+            background-color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            color: #0f1117;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 14px 28px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #join-btn:disabled {
+            background-color: #333745;
+            color: #71788e;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #join-btn:not(:disabled):hover {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .schedule-box {
+            width: 100%;
+            margin-top: 24px;
+            padding: 20px 16px;
+            background-color: #181b24;
+            border-radius: 8px;
+            border: 1px solid #262a36;
+        }
+
+        .schedule-title {
+            font-size: 0.85rem;
+            color: #a0a8c0;
+            margin-bottom: 8px;
+        }
+
+        .countdown-display {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.05em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        @media (max-width: 480px) {
+            h1.title {
+                font-size: 1.25rem;
+            }
+            .countdown-display {
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="../image/ktv.png" alt="記念ロゴ" class="header-logo">
+    </header>
+
+    <main>
+        <p class="tagline">㊗池田壮汰 16歳誕生日記念動画 powered by コガテレ</p>
+        <h1 class="title">特設視聴ページ</h1>
+
+        <div id="video-wrapper">
+            <div id="overlay">
+                <p id="overlay-status">公開時間までお待ちください</p>
+                <button id="join-btn" disabled>公開までお待ちください</button>
+            </div>
+
+            <!-- YouTube Player -->
+            <div id="player"></div>
+        </div>
+
+        <div class="schedule-box">
+            <p class="schedule-title">動画公開日時：8月27日 0:10〜</p>
+            <div id="countdown" class="countdown-display">計算中...</div>
+        </div>
+    </main>
+
+    <script>
+        // ★YouTube動画のID（11桁）を入れてください
+        const YOUTUBE_VIDEO_ID = 'g8Dz8iD_uVo';
+
+        // ★テスト視聴したい時は「true」、本番の時は「false」にしてください
+        const IS_TEST_MODE = true; 
+
+        let player;
+        let isReadyToPlay = false;
+        let hasAutoStarted = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: YOUTUBE_VIDEO_ID,
+                playerVars: {
+                    'controls': 1,        
+                    'rel': 0,             
+                    'modestbranding': 1,  
+                    'playsinline': 1,
+                    'enablejsapi': 1,
+                    'origin': window.location.origin
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // エラー153対策：生成されたiframeにreferrerpolicyを強制付与
+            const iframe = document.getElementById('player');
+            if (iframe) {
+                const actualIframe = iframe.querySelector('iframe');
+                if (actualIframe) {
+                    actualIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                }
+            }
+            player.mute();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const overlay = document.getElementById("overlay");
+            const overlayStatus = document.getElementById("overlay-status");
+            const joinBtn = document.getElementById("join-btn");
+            const countdownEl = document.getElementById("countdown");
+
+            if (IS_TEST_MODE) {
+                overlayStatus.textContent = "【テストモード動作中】ボタンを押すと再生を開始します";
+                joinBtn.textContent = "テスト視聴を開始";
+                joinBtn.disabled = false;
+            }
+
+            joinBtn.addEventListener("click", () => {
+                if (IS_TEST_MODE) {
+                    if (player && player.playVideo) {
+                        player.unMute();
+                        player.playVideo();
+                    }
+                    overlay.style.opacity = "0";
+                    setTimeout(() => {
+                        overlay.style.display = "none";
+                    }, 400);
+                } else if (!isReadyToPlay && !joinBtn.disabled) {
+                    isReadyToPlay = true;
+                    if (player && player.unMute) {
+                        player.unMute();
+                    }
+                    overlayStatus.textConte = "準備完了！公開時間になると自動で再生されます";
+                    joinBtn.textContent = "待機中...";
+                    joinBtn.disabled = true;
+                }
+            });
+
+            function updateCountdown() {
+                if (IS_TEST_MODE) {
+                    countdownEl.textContent = "テストモード（制限解除中）";
+                    return;
+                }
+
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                
+                const startDate = new Date(currentYear, 7, 27, 0, 10, 0); 
+                const endDate = new Date(currentYear, 7, 27, 23, 59, 59);
+
+                if (now > endDate) {
+                    countdownEl.textContent = "配信終了";
+                    overlayStatus.textContent = "配信は終了しました";
+                    joinBtn.style.display = "none";
+                    return;
+                }
+
+                if (now >= startDate && now <= endDate) {
+                    countdownEl.textContent = "配信中";
+
+                    if (!hasAutoStarted) {
+                        hasAutoStarted = true;
+                        const elapsedSeconds = Math.floor((now - startDate) / 1000);
+
+                        if (player && player.seekTo) {
+                            player.seekTo(elapsedSeconds, true);
+                            player.playVideo();
+                            if (isReadyToPlay) {
+                                player.unMute();
+                            }
+                        }
+
+                        overlay.style.opacity = "0";
+                        setTimeout(() => {
+                            overlay.style.display = "none";
+                        }, 400);
+                    }
+                    return;
+                }
+
+                const diff = startDate - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                let text = "公開まで ";
+                if (days > 0) text += `${days}日 `;
+                text += `${String(hours).padStart(2, '0')}時間${String(minutes).padStart(2, '0')}分${String(seconds).padStart(2, '0')}秒`;
+
+                countdownEl.textContent = text;
+
+                if (!isReadyToPlay) {
+                    overlayStatus.textContent = "時間になると再生できるようになります";
+                    joinBtn.textContent = "公開までお待ちください";
+                    joinBtn.disabled = true;
+                }
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        });
+    </script>
+</body>
+</html>
